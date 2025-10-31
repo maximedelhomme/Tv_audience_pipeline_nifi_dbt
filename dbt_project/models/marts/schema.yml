@@ -1,0 +1,20 @@
+version: 2
+models:
+  - name: fact_audience
+    tests:
+      - unique:
+          column_name: "(date, country, channel_std, program)"
+    columns:
+      - name: date
+        tests: [not_null]
+      - name: country
+        tests: [not_null]
+      - name: channel_std
+        tests: [not_null]
+      - name: program
+        tests: [not_null]
+      - name: viewers
+        tests: [not_null]
+  - name: kpi_top10
+    columns:
+      - name: rank_in_country

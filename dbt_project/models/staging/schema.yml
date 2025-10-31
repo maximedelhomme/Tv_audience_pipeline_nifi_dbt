@@ -1,0 +1,24 @@
+version: 2
+models:
+  - name: stg_audience
+    columns:
+      - name: date
+        tests: [not_null]
+      - name: country
+        tests: [not_null]
+      - name: channel
+        tests: [not_null]
+      - name: program
+        tests: [not_null]
+      - name: viewers
+        tests: [not_null]
+      - name: loaded_at
+        tests: [not_null]
+  - name: stg_dim_channels
+    columns:
+      - name: country
+        tests: [not_null]
+      - name: alias
+        tests: [not_null]
+      - name: channel_std
+        tests: [not_null]

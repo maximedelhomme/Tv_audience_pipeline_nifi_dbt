@@ -1,0 +1,10 @@
+name: 'tv_audience_mini'
+version: '1.0.0'
+config-version: 2
+profile: 'tv_audience_profile'
+models:
+  tv_audience_mini:
+    staging:
+      +schema: stage
+    marts:
+      +schema: marts
