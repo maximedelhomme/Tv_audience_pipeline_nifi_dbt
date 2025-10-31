@@ -1,49 +1,45 @@
-# TV Audience Mini Pipeline (NiFi + dbt + DuckDB)
+# TV Audience Pipeline — NiFi + dbt + DuckDB
 
-But : mini-projet 2h30 max pour montrer un flux **NiFi** qui dépose des fichiers, puis déclenche **dbt** (DuckDB) pour produire des tables d'audience propres + un top 10 par pays/date.
+**Mini end-to-end data pipeline** for international TV audiences.  
+**NiFi** handles ingestion & orchestration, **dbt + DuckDB** perform SQL transforms & data tests, and the pipeline produces **CSV exports** ready to share.
 
-## Vue d'ensemble (simple)
-1. **NiFi** prend des CSV depuis `data/inbox/` et les copie dans `data/staging/`.
-2. NiFi lance `scripts/load_to_duckdb.py` (charge le staging dans `warehouse.duckdb`).
-3. NiFi lance **dbt** : `dbt run` puis `dbt test` (DuckDB).
-4. Si OK, NiFi lance `scripts/export_results.py` (écrit les CSV finaux dans `exports/`).
+---
 
-## Structure du repo
-data/
-  inbox/
-  staging/
-dbt_project/
-  models/
-    staging/
-    marts/
-exports/
-scripts/
-warehouse.duckdb  (créée au 1er run)
+## What this solves
+- Automate **file ingestion → transformations → exports** with a clear, visual flow  
+- Clean & **deduplicate** audiences (keep latest `loaded_at`)  
+- Standardize channels using a **reference table**  
+- Produce a **Top 10 programs** KPI by **date** and **country**  
+- Enforce **data quality** (dbt tests: `not_null`, `unique`)
 
-## Prérequis locaux
-- Python 3.10+
-- `pip install duckdb pandas dbt-core dbt-duckdb`
-- Créer `~/.dbt/profiles.yml` :
-tv_audience_profile:
-  target: dev
-  outputs:
-    dev:
-      type: duckdb
-      path: warehouse.duckdb
+---
 
-## Exécution rapide (sans NiFi)
-cp -r data/inbox/* data/staging/
-python scripts/load_to_duckdb.py
-cd dbt_project && dbt run && dbt test && cd ..
-python scripts/export_results.py
-# Résultats : exports/marts.fact_audience.csv, exports/marts.kpi_top10.csv
+## Components
+- **Apache NiFi** – `GetFile → PutFile → ExecuteStreamCommand(...)`
+- **dbt Core + dbt-duckdb** – ELT, tests, model lineage
+- **DuckDB** – embedded analytical DB (single `.duckdb` file)
+- **Python** – small loaders/exports (Pandas + DuckDB)
 
-## NiFi (démo simple)
-1) GetFile  -> ./data/inbox
-2) PutFile  -> ./data/staging
-3) ExecuteProcess -> python scripts/load_to_duckdb.py
-4) ExecuteProcess -> dbt run   (Working Dir: ./dbt_project)
-5) ExecuteProcess -> dbt test  (Working Dir: ./dbt_project)
-6) ExecuteProcess -> python scripts/export_results.py
+---
 
-Routes d'erreur -> email/webhook d'alerte.
+## Data & Model
+Toy but realistic dataset to keep the demo reproducible:
+- **Facts**: `audience` (`date, country, channel, program, viewers, loaded_at`)
+- **Dim**: `dim_channels` (alias → `channel_std`)
+- **Models**
+  - `stg_audience` → clean + **ROW_NUMBER** dedupe by `(date, country, channel, program)`
+  - `stg_dim_channels` → standardize names
+  - `fact_audience` → conformed fact table
+  - `kpi_top10` → Top 10 programs per `(date, country)`
+
+---
+
+## Screenshots
+### Process Group
+![Process Group](IMG/Process Group.png)
+
+### INGESTION
+![INGESTION](IMG/INGESTION.png)
+
+### ORCHESTRATION
+![ORCHESTRATION](IMG/ORCHESTRATION.png)
