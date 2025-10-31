@@ -1,4 +1,4 @@
-# TV Audience Pipeline — NiFi + dbt + DuckDB
+# TV Audience Pipeline — NiFi + dbt
 
 **Mini end-to-end data pipeline** for international TV audiences.  
 **NiFi** handles ingestion & orchestration, **dbt + DuckDB** perform SQL transforms & data tests, and the pipeline produces **CSV exports** ready to share.
