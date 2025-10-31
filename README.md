@@ -36,7 +36,7 @@ Toy but realistic dataset to keep the demo reproducible:
 
 ## Screenshots
 ### PROCESS GROUP
-![PROCESS GROUP](IMG/Process_Group.png)
+![PROCESS GROUP](IMG/PROCESS_GROUP.png)
 
 ### INGESTION
 ![INGESTION](IMG/INGESTION.png)
